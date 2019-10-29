@@ -1,16 +1,14 @@
-:orphan:
+MoveIt チュートリアル
+============================
 
-MoveIt Tutorials
-=================
-
-These tutorials will quickly get you, and your robot, using the MoveIt Motion Planning Framework.
+本チュートリアルでは，MoveIt Motion Planning Frameworkをすぐに使うための方法を紹介します．
 
 .. image:: doc/quickstart_in_rviz/rviz_plugin_head.png
    :width: 700px
 
-In these tutorials, the Franka Emika Panda robot is used as a quick-start demo. Alternatively, you can easily use any robot that has already been configured to work with MoveIt - check the `list of robots running MoveIt <http://moveit.ros.org/robots/>`_ to see whether MoveIt is already available for your robot. Otherwise, you can setup MoveIt to work with your custom robot in the tutorial section "Integration with a New Robot", below.
+本チュートリアルでは，Franka Emika Panda をクイックスタートのデモ用ロボットとして使用します．このロボット以外にも，MoveItのセットアップが完了しているロボットであれば簡単に利用することができます．是非 `list of robots running MoveIt <http://moveit.ros.org/robots/>`_ のページをご覧頂き，どのロボットならMoveItを利用可能になっているのかをチェックしてみてください．仮にMoveItが利用可能なロボット一覧の中に無くても，「新規のロボットのセットアップ」セクションにてオリジナルのロボットでのセットアップ方法を紹介します．
 
-Getting Started with MoveIt and RViz
+MoveItとRVizから始める 
 -------------------------------------
 .. toctree::
    :maxdepth: 1
@@ -18,9 +16,9 @@ Getting Started with MoveIt and RViz
    doc/getting_started/getting_started
    doc/quickstart_in_rviz/quickstart_in_rviz_tutorial
 
-MoveGroup - ROS Wrappers in C++ and Python
+MoveGroup - C++，PythonのROSラッパー
 ------------------------------------------
-The simplest way to use MoveIt through scripting is using the ``move_group_interface``. This interface is ideal for beginners and provides unified access to many of the features of MoveIt.
+スクリプトからMoveItを動かす最も簡単な方法は ``move_group_interface`` を利用する方法です．このインターフェースは初心者にとって理想的であり，MoveItの多くの機能に簡単にアクセスすることができます．
 
 .. toctree::
    :maxdepth: 1
@@ -29,9 +27,9 @@ The simplest way to use MoveIt through scripting is using the ``move_group_inter
    doc/move_group_python_interface/move_group_python_interface_tutorial
    doc/moveit_commander_scripting/moveit_commander_scripting_tutorial
 
-Using MoveIt Directly Through the C++ API
+C++ APIから直接MoveItを使う
 ------------------------------------------
-Building more complex applications with MoveIt often requires developers to dig into MoveIt’s C++ API. As an added plus, using the C++ API directly skips many of the ROS Service/Action layers resulting in significantly faster performance.
+MoveItを用いてより複雑なアプリケーションを作る際には，MoveItのC++ APIが必要になるでしょう．また，C++ APIを利用することでROSの Service/Actionレイヤーをスキップし，大幅な速度向上にもつながるでしょう．
 
 .. toctree::
    :maxdepth: 1
@@ -48,11 +46,11 @@ Building more complex applications with MoveIt often requires developers to dig 
    doc/pick_place/pick_place_tutorial
    doc/moveit_grasps/moveit_grasps_tutorial
    doc/moveit_task_constructor/moveit_task_constructor_tutorial
-   doc/subframes/subframes_tutorial
-
-Integration with a New Robot
+   doc/subframes/subframes_tutorial          
+              
+新規のロボットのセットアップ
 ----------------------------
-Before attempting to integrate a new robot with MoveIt, check whether your robot has already been setup (see the `list of robots running MoveIt <http://moveit.ros.org/robots/>`_). Otherwise, follow the tutorials in this section to integrate your robot with MoveIt (and share your results on the MoveIt mailing list)
+MoveItで新規のロボットとしてセットアップする前に，あなたのロボットがすでにセットアップされているかどうかを確認してみてください．（`list of robots running MoveIt <http://moveit.ros.org/robots/>`_ から確認できます．）リストに無い場合は，本セクションのチュートリアルに従ってセットアップしてください．（そして是非，MoveItのメーリングリストでセットアップの結果を共有してください．）
 
 .. toctree::
    :maxdepth: 1
@@ -64,8 +62,8 @@ Before attempting to integrate a new robot with MoveIt, check whether your robot
    doc/ikfast/ikfast_tutorial
    doc/trac_ik/trac_ik_tutorial
 
-Configuration
--------------
+その他の設定
+-----------------------
 .. toctree::
    :maxdepth: 1
 
@@ -77,7 +75,7 @@ Configuration
    doc/trajopt_planner/trajopt_planner_tutorial
    doc/planning_adapters/planning_adapters_tutorial.rst
 
-Miscellaneous
+その他の機能
 ----------------------------
 
 .. toctree::
@@ -88,11 +86,14 @@ Miscellaneous
    doc/benchmarking/benchmarking_tutorial
    doc/tests/tests_tutorial
 
-Attribution
+帰属
 -----------
-Major contributors to the MoveIt tutorials are listed in chronological order: Sachin Chitta, Dave Hershberger, Acorn Pooley, Dave Coleman, Michael Gorner, Francisco Suarez, Mike Lautman. Help us improve these docs and we'll be happy to include you here also!
+MoveItチュートリアルの主な貢献者（古い順）：
+Sachin Chitta, Dave Hershberger, Acorn Pooley, Dave Coleman, Michael Gorner, Francisco Suarez, Mike Lautman．
+是非一緒にドキュメントの更新をしましょう．あなたの名前を追加するのを楽しみにしています！
 
-The tutorials had a major update in 2018 during a code sprint sponsored by Franka Emika in collaboration with PickNik (`Check out the blog post! <http://moveit.ros.org/moveit!/ros/2018/02/26/tutorials-documentation-codesprint.html>`_)
+本チュートリアルは Franka Emika，PickNik の支援で2018年にメジャーアップデートを行いました．（`是非ブログもチェックしてみてください！ <http://moveit.ros.org/moveit!/ros/2018/02/26/tutorials-documentation-codesprint.html>`_）
+
 
 .. image:: ./_static/franka_logo.png
    :width: 300px
