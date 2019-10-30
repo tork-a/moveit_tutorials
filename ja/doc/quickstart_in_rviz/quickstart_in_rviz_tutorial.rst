@@ -1,36 +1,37 @@
-MoveIt Quickstart in RViz
-==========================
+MoveItクイックスタート with RViz
+================================
 .. image:: rviz_plugin_head.png
    :width: 700px
 
-This tutorial will quickly get you motion planning using MoveIt via RViz and the MoveIt plugin. Rviz is the primary visualizer in ROS and an incredibly useful tool for debugging robotics. The MoveIt Rviz plugin allows you to setup virtual environments (scenes), create start and goal states for the robot interactively, test various motion planners, and visualize the output. Let's go!
+本チュートリアルではRVizやMoveItプラグインを使い，MoveItで簡単にモーションプランニングを行えるようにします．RVizとはROSの標準的なビジュアライザであり，ロボットのデバッグにとても便利なツールです．MoveItのRVizプラグインでは，仮想環境（シーン）のセットアップや，開始，終了姿勢のインタラクティブな生成，様々なプランナのテストと結果の表示までできます．早速始めましょう！
+           
 
-Getting Started
+はじめに
 ---------------
-If you haven't already done so, make sure you've completed the steps in `Getting Started <../getting_started/getting_started.html>`_.
+まだ `はじめに <../getting_started/getting_started.html>`_ を終わらせていない方は，先にそちらをご覧ください．
 
-Step 1: Launch the Demo and Configure the Plugin
+Step 1: デモの起動とプラグインの設定
 ------------------------------------------------
 
-* Launch the demo: ::
+* デモの起動 ::
 
    roslaunch panda_moveit_config demo.launch rviz_tutorial:=true
 
-* If you are doing this for the first time, you should see an empty world in RViz and will have to add the Motion Planning Plugin:
+* 初めて起動する場合，何も表示されていないRVizが起動するので，"Motion Planning Plugin" を追加する必要があります．
 
-  * You should see an empty world in RViz:
+  * 何も表示されていないRViz．
 
   |A|
 
-  * In the RViz Displays Tab, press *Add*:
+  * "Display"タブより，"Add" ボタンを押下．
 
   |B|
 
-  * From the moveit_ros_visualization folder, choose "MotionPlanning" as the DisplayType. Press "Ok".
+  * "moveit_ros_visualization" フォルダより"MotionPlanning"を選択し，"OK"ボタンを押下．
 
   |C|
 
-  * You should now see the Panda robot in RViz:
+  * 成功すれば，RVizに Panda ロボットが表示されます．
 
   |D|
 
@@ -46,146 +47,143 @@ Step 1: Launch the Demo and Configure the Plugin
 .. |D| image:: rviz_start.png
                :width: 700px
 
-* Once you have the Motion Planning Plugin loaded, we can configure it. In the "Global Options" tab of the "Displays" subwindow, set the **Fixed Frame** field to ``/panda_link0``
+* "Motion Planning Plugin"がロードできれば，設定を行うことができます．．"Global Options"タブ内の"Display"ウィンドウ内にある "**Fixed Frame**"に ``/panda_link0`` と入力してください．
 
-* Now, you can start configuring the Plugin for your robot (the Panda in this case). Click on "MotionPlanning" within "Displays".
+* これで，ロボット（ここでは Panda）のプラグインの設定を始める事ができます．"Displays"内の"MotionPlanning"をクリックしてみてください．
 
-  * Make sure the **Robot Description** field is set to ``robot_description``.
+  * "**Robot Description**"の設定内容が ``robot_description`` になっていることを確認してください．
 
-  * Make sure the **Planning Scene Topic** field is set to ``/planning_scene``.
-    Click on topic name to expose topic-name drop-down.
+  * "**Planning Scene Topic**"の設定内容が ``/planning_scene`` になっていることを確認してください．
+    "topic name"をクリックすると，トピック名がドロップダウンに出てきます．
 
-  * In **Planning Request**, change the **Planning Group** to ``panda_arm``.
+  * "**Planning Request**"内の，"**Planning Group**"を ``panda_arm`` に設定してください．
 
-  * In **Planned Path**, change the **Trajectory Topic** to ``/move_group/display_planned_path``.
+  * "**Planned Path**"内の，"**Trajectory Topic**"を ``/move_group/display_planned_path`` に設定してください．
 
 .. image:: rviz_plugin_start.png
    :width: 700px
 
 
-Step 2: Play with the Visualized Robots
----------------------------------------
-There are four different overlapping visualizations:
+Step 2: ロボットの表示を色々変えてみる
+-----------------------------------------
+ロボットは下記の4つが重なって表示されています．
 
-#. The robot's configuration in the ``/planning scene`` planning environment (active by default).
 
-#. The planned path for the robot (active by default).
+#. プランニング環境 ``/planning scene`` に設定されているロボットの設定（デフォルトで有効）．
 
-#. Green: The start state for motion planning (disabled by default).
+#. ロボットのプランニング軌道（デフォルトで有効）．
 
-#. Orange: The goal state for motion planning (active by default).
+#. 緑：モーションプランニングの開始姿勢（デフォルトで無効）．
 
-The display states for each of these visualizations can be toggled on and off using checkboxes:
+#. 橙：モーションプランニングの目標姿勢（デフォルトで有効）．
 
-#. The planning scene robot using the **Show Robot Visual** checkbox in the **Scene Robot** tab.
+これらの表示，非表示は下記チェックボックスで切り替えが可能です．
 
-#. The planned path using the **Show Robot Visual** checkbox in the **Planned Path** tab.
+#. プランニング環境に設定されているロボット（シーンロボット）は"**Scene Robot**"タブ内の"**Show Robot Visual**"チェックボックスから切り替えが可能．
 
-#. The start state using the **Query Start State** checkbox in the **Planning Request** tab.
+#. プランニング軌道は"**Planned Path**"タブ内の"**Show Robot Visual**"チェックボックスから切り替えが可能．
 
-#. The goal state using the **Query Goal State** checkbox in the **Planning Request** tab.
+#. 開始姿勢は"**Planning Request**"タブ内の"**Query Start State**"チェックボックスから切り替えが可能．
 
-* Play with all these checkboxes to switch on and off different visualizations.
+#. 終了姿勢は"**Planning Request**"タブ内の"**Query Goal State**"チェックボックスから切り替えが可能．
+
+* 各チェックボックスを色々切り替えて表示の変化を確認してみましょう！
 
 .. image:: rviz_plugin_visualize_robots.png
    :width: 700px
 
-Step 3: Interact with the Panda
+Step 3: Pandaを動かしてみる
 -------------------------------
+次のステップでは，シーンロボット，開始姿勢，目標姿勢のみを使用します．
 
-For the next steps we will want only the scene robot, start state and goal state:
+#. "**Planned Path**"タブの"**Show Robot Visual**"を有効にしてください．
 
-#. Check the **Show Robot Visual** checkbox in the **Planned Path** tab
+#. "**Scene Robot**"タブの"**Show Robot Visual**"を無効にしてください．
 
-#. Un-check the **Show Robot Visual** checkbox in the **Scene Robot** tab
+#. "**Planning Request**"タブの"**Query Goal State**"を有効にしてください．
 
-#. Check the **Query Goal State** checkbox in the **Planning Request** tab.
+#. "**Planning Request**"タブの"**Query Start State**"を有効にしてください．
 
-#. Check the **Query Start State** checkbox in the **Planning Request** tab.
-
-There should now be two interactive markers. One marker corresponding to the orange colored arm will be used to set the "Goal State" for motion planning and the other marker corresponding to a green colored arm are used to set the "Start State" for motion planning. If you don't see the interactive markers press **Interact** in the top menu of RViz (Note: some tools may be hidden, press **"+"** in the top menu to add the **Interact** tool as shown below).
+ここまで完了すると，2つのインタラクティブマーカが出ているはずです．オレンジ色のアームの周りに出ているマーカは"Goal State"（目標姿勢）を設定するのに使用し，もう一方の緑のアームの周りに出ているマーカは"Start State"（開始姿勢）を設定するのに使用します．もしこれらのインタラクティブマーカが表示されていない場合には，RVizのトップメニュー内にある"**Interact**"を押下してください．（Note：ツールが隠れて見えない場合には，下図の"**Interact**"ボタンの右横に見える **"+"** ボタンを押して "**Interact**" ツールを表示させてください．）
 
 .. image:: rviz_plugin_interact.png
    :width: 700px
 
-You should now be able to use these markers to drag the arm around and change its orientation. Try it!
+これでマーカをドラッグしてアームを動かし，好きな姿勢に設定できるようになりました．いろいろと動かして遊んでみましょう！
 
-Moving into collision
+衝突位置まで動かす
 +++++++++++++++++++++
-Note what happens when you try to move one of the arms into collision with the other. The two links that are in collision will turn red.
+アームが衝突範囲に入った場合どうなるか確認してみましょう．下図のように２つの衝突しているリンクが赤くなるはずです．
 
 .. image:: rviz_plugin_collision.png
    :width: 700px
 
-The "Use Collision-Aware IK" checkbox found within the MotionPlanning plugin under the Planning tab allows you to toggle the behavior of the IK solver. When the checkbox is ticked, the solver will keep attempting to find a collision-free solution for the desired end-effector pose. When it is not checked, the solver will allow collisions to happen in the solution. The links in collision will always still be visualized in red, regardless of the state of the checkbox.
+"Planning"タブ下の"MotionPlanning"プラグインに表示されている"Use Collision-Aware IK"チェックボックスにより，IK（Inverce Kinematics，逆運動学）ソルバの設定を変えることができます．チェックボックスを有効にした場合，ソルバはエンドエフェクタの姿勢に合わせ，非衝突な姿勢を算出します．一方チェックボックスを無効にした場合，ソルバは衝突，非衝突を考慮することなく計算を行います．なお，このチェックボックスをどちらに設定しても，衝突しているリンクは赤色で表示されます．
 
 .. image:: rviz_plugin_collision_aware_ik_checkbox.png
    :width: 700px
 
-Moving out of Reachable Workspace
+到達不可能な領域に動かす場合
 +++++++++++++++++++++++++++++++++
-Note what happens when you try to move an end-effector out of its reachable workspace.
+エンドエフェクタをアームが到達不可能な領域まで動かした場合どうなるか確認しておきましょう．下図のようにアームが追従しなくなるはずです．
 
 .. image:: rviz_plugin_invalid.png
    :width: 700px
 
-Step 4: Use Motion Planning with the Panda
--------------------------------------------
+Step 4: Pandaでモーションプランニングを行う
+---------------------------------------------------
 
-* Now, you can start motion planning with the Panda in the MoveIt RViz Plugin.
+* MoveIt RVizプラグインを使ってPandaのモーションプランニングを行いましょう！
 
-  * Move the Start State to a desired location.
+  * 開始姿勢を任意の姿勢に設定してください．
 
-  * Move the Goal State to another desired location.
+  * 目標姿勢を他の任意の姿勢に設定してください．
 
-  * Make sure both states are not in collision with the robot itself.
+  * 開始姿勢，目標姿勢のどちらともが自己干渉していないことを確認してください．
 
-  * Make sure the Planned Path is being visualized. Also check the
-    **Show Trail** checkbox in the **Planned Path** tab.
+  * 生成する軌道を表示するために，"**Planned Path**"タブ内の"**Show Trail**"チェックボックスを有効にしてください．
 
-* In the **MotionPlanning** window under the **Planning** tab, press the **Plan** button. You
-  should be able to see a visualization of the arm moving and a trail.
+* "**Planning**"タブ下の"**MotionPlanning**"ウィンドウにある"**Plan**"ボタンを押下してください．うまくいけば生成した軌道が表示されるはずです．
 
 .. image:: rviz_plugin_planned_path.png
    :width: 700px
 
-Introspecting Trajectory Waypoints
+生成軌道の軌跡を確認する
 ++++++++++++++++++++++++++++++++++
+RVizから生成した軌道の軌跡を確認することができます．
 
-You can visually introspect trajectory point by point on RViz.
+* "`Panels`" メニューから，"`MotionPlanning - Slider`"を選択すると，RViz上にスライダパネルが表示されます．
 
-* From "`Panels`" menu, select "`MotionPlanning - Slider`". You'll see a new Slider panel on RViz.
+* 目標姿勢を設定し， `Plan` を行ってください．
 
-* Set your goal pose, then run `Plan`.
+* スライダを動かした後"`Play`"ボタンを押してみるなどして，"`Slider`"パネルの挙動を確認してみましょう．
 
-* Play with the "`Slider`" panel, e.g. move the slider, push "`Play`" button.
-
-NOTE: Once you placed your EEF to a new goal, be sure to run `Plan` before running `Play` -- otherwise you'll see the waypoints for the previous goal if available.
+.. note:: 一度エンドエフェクタを新しい目標姿勢まで動かした場合は， `Play` を行う前に， `Plan` を行うのを忘れないでください．これを行わなかった場合，新しい目標姿勢までの軌道ではなく，前回プランニングした際の軌道が表示されることになります．
 
 .. image:: rviz_plugin_slider.png
    :width: 700px
 
 
-Next Steps
-----------
+次のステップ
+--------------
 
-RViz Visual Tools
+RViz表示ツール
 +++++++++++++++++
-Many of the tutorials use ``moveit_visual_tools`` to step through a demo. Before continuing on to the next tutorials it is a good idea to enable the **RvizVisualToolsGui**.
+多くのチュートリアルで ``moveit_visual_tools`` を利用しています．次のチュートリアルへ移る前に "**RvizVisualToolsGui**"を有効にすることをおすすめします．
 
-From "`Panels`" menu, select "`RvizVisualToolsGui`". You'll see the new panel added to RViz.
+"`Panels`"メニューから"`RvizVisualToolsGui`"を選択してください．すると下図のようにRVizに新しいパネルが追加されるはずです．
 
 .. image:: rviz_pannels.png
    :width: 700px
 
-Saving Your Configuration
+設定情報を保存する
 +++++++++++++++++++++++++
-RViz enables you to save your configuration under ``File->Save Config``. You should do this before continuing on to the next tutorials.
+RVizでは ``File->Save Config`` から，設定ファイルを保存することができます．次のチュートリアルに移る前に設定を保存しておくことをおすすめします．
 
-Next Tutorials
-++++++++++++++
-* To easily control your robot using C++, check out the `Move Group C++ Interface <../move_group_interface/move_group_interface_tutorial.html>`_
+次のチュートリアル
+++++++++++++++++++++
+* C++からロボットを操作したい場合は， `Move Group C++ インタフェース <../move_group_interface/move_group_interface_tutorial.html>`_ を確認してください．
 
-* To easily control your robot using Python, check out the `Move Group Python Interface <../move_group_python_interface/move_group_python_interface_tutorial.html>`_
+* Pythonからロボットを操作したい場合は， `Move Group Python インタフェース <../move_group_python_interface/move_group_python_interface_tutorial.html>`_ を確認してください．
 
-* To create your own ``*_moveit_config`` package, check out the `Setup Assistant <../setup_assistant/setup_assistant_tutorial.html>`_
+* オリジナルのロボットで ``*_moveit_config`` パッケージを作りたい場合には， `セットアップアシスタント <../setup_assistant/setup_assistant_tutorial.html>`_ を確認してください．
