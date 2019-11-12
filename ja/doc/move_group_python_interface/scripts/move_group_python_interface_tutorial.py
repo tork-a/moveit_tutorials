@@ -36,9 +36,8 @@
 
 ## BEGIN_SUB_TUTORIAL imports
 ##
-## To use the Python MoveIt interfaces, we will import the `moveit_commander`_ namespace.
-## This namespace provides us with a `MoveGroupCommander`_ class, a `PlanningSceneInterface`_ class,
-## and a `RobotCommander`_ class. More on these below. We also import `rospy`_ and some messages that we will use:
+## Python MoveIt インターフェースを使うため， `moveit_commander`_ namespaceを導入します．
+## このnamespaceは `MoveGroupCommander`_ と `PlanningSceneInterface`_ ， `RobotCommander`_ のクラスを提供してくれます．更に下記で示される `rospy`_ と メッセージをインポートします:
 ##
 
 import sys
@@ -83,30 +82,27 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL setup
     ##
-    ## First initialize `moveit_commander`_ and a `rospy`_ node:
+    ## まず `moveit_commander`_ と `rospy`_ ノードを初期化します:
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('move_group_python_interface_tutorial', anonymous=True)
 
-    ## Instantiate a `RobotCommander`_ object. Provides information such as the robot's
-    ## kinematic model and the robot's current joint states
+    ## オブジェクト `RobotCommander`_ を生成します． ロボットの
+    ## 運動学モデルと現在のジョイント状態の情報を提供してくれます
     robot = moveit_commander.RobotCommander()
 
-    ## Instantiate a `PlanningSceneInterface`_ object.  This provides a remote interface
-    ## for getting, setting, and updating the robot's internal understanding of the
-    ## surrounding world:
+    ## オブジェクト `PlanningSceneInterface`_ を生成します．これはロボットを取り巻く内部環境を理解するために必要な情報を得る・設定する・変更するのに必要な遠隔インタフェースを提供してくれます:
     scene = moveit_commander.PlanningSceneInterface()
 
-    ## Instantiate a `MoveGroupCommander`_ object.  This object is an interface
-    ## to a planning group (group of joints).  In this tutorial the group is the primary
-    ## arm joints in the Panda robot, so we set the group's name to "panda_arm".
-    ## If you are using a different robot, change this value to the name of your robot
-    ## arm planning group.
-    ## This interface can be used to plan and execute motions:
+    ## Instantiate aオブジェクト `MoveGroupCommander`_ を生成します．このオブジェクトはplanning group（ジョイント群）のためのインタフェースです．
+    ## このチュートリアルではplanning groupはPandaの一番はじめの腕の関節であるので，
+    ## planning groupの名前は "panda_arm" としてあります．
+    ## もし他のロボットを利用する際には，今回変更してあるplanning groupの名前をそのロボットの名前に変更してください．
+    ## このインタフェースは計画と実行をするのに用いられます:
     group_name = "panda_arm"
     move_group = moveit_commander.MoveGroupCommander(group_name)
 
-    ## Create a `DisplayTrajectory`_ ROS publisher which is used to display
-    ## trajectories in Rviz:
+    ## Rvizで軌道を表すための
+    ## `DisplayTrajectory`_ ROSパブリッシャを作ります:
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
                                                    queue_size=20)
@@ -115,7 +111,7 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL basic_info
     ##
-    ## Getting Basic Information
+    ## 基本情報の取得
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^
     # We can get the name of the reference frame for this robot:
     planning_frame = move_group.get_planning_frame()
@@ -155,10 +151,10 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL plan_to_joint_state
     ##
-    ## Planning to a Joint Goal
-    ## ^^^^^^^^^^^^^^^^^^^^^^^^
-    ## The Panda's zero configuration is at a `singularity <https://www.quora.com/Robotics-What-is-meant-by-kinematic-singularity>`_ so the first
-    ## thing we want to do is move it to a slightly better configuration.
+    ## ゴールジョイントへの計画
+    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ## Pandaのゼロ・コンフィグレーションは `singularity <https://www.quora.com/Robotics-What-is-meant-by-kinematic-singularity>`_ にあります．
+    ## なので私達がやりたいことは，まずPandaをより良いコンフィグレーションに移すことです．
     # We can get the joint values from the group and adjust some of the values:
     joint_goal = move_group.get_current_joint_values()
     joint_goal[0] = 0
@@ -191,10 +187,10 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL plan_to_pose
     ##
-    ## Planning to a Pose Goal
-    ## ^^^^^^^^^^^^^^^^^^^^^^^
-    ## We can plan a motion for this group to a desired pose for the
-    ## end-effector:
+    ## ゴール姿勢への計画
+    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ## 任意のエンドエフェクタの姿勢をこれらの記述で
+    ## 動作を計画することができます:
     pose_goal = geometry_msgs.msg.Pose()
     pose_goal.orientation.w = 1.0
     pose_goal.position.x = 0.4
@@ -203,7 +199,7 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     move_group.set_pose_target(pose_goal)
 
-    ## Now, we call the planner to compute the plan and execute it.
+    ## ここでは上記の計画/実行をするためのプランナを呼びます．
     plan = move_group.go(wait=True)
     # Calling `stop()` ensures that there is no residual movement
     move_group.stop()
@@ -228,11 +224,10 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL plan_cartesian_path
     ##
-    ## Cartesian Paths
-    ## ^^^^^^^^^^^^^^^
-    ## You can plan a Cartesian path directly by specifying a list of waypoints
-    ## for the end-effector to go through. If executing  interactively in a
-    ## Python shell, set scale = 1.0.
+    ## Cartesian パス
+    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ## エンドエフェクタの経路座標を明示することで直接Cartesianパスを計画することができます．
+    ## 実行する際には，Python shellでscale = 1.0にしてください．
     ##
     waypoints = []
 
@@ -272,15 +267,15 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL display_trajectory
     ##
-    ## Displaying a Trajectory
+    ## 経路の表示
     ## ^^^^^^^^^^^^^^^^^^^^^^^
-    ## You can ask RViz to visualize a plan (aka trajectory) for you. But the
-    ## group.plan() method does this automatically so this is not that useful
-    ## here (it just displays the same trajectory again):
+    ## RVizに計画 (aka trajectory) を可視化させることができます．しかし
+    ## group.plan() method は自動的にこの作業を行ってくれるので，ここではあまり重要なことではありませんが
+    ## 頭の片隅に留めておいてください（下記のコードは再度同じ経路を示しているだけです）:
     ##
-    ## A `DisplayTrajectory`_ msg has two primary fields, trajectory_start and trajectory.
-    ## We populate the trajectory_start with our current robot state to copy over
-    ## any AttachedCollisionObjects and add our plan to the trajectory.
+    ## `DisplayTrajectory`_ msg はtrajectory_start と trajectoryという２つの初期領域を持ちます．
+    ## 今回はtrajectory_startではどんなAttachedCollisionObjectsでも上書きするための
+    ## ロボットの現在の状態を示し，trajectoryでは計画を追加するようにしてあります．
     display_trajectory = moveit_msgs.msg.DisplayTrajectory()
     display_trajectory.trajectory_start = robot.get_current_state()
     display_trajectory.trajectory.append(plan)
@@ -298,14 +293,13 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL execute_plan
     ##
-    ## Executing a Plan
+    ## 計画の実行
     ## ^^^^^^^^^^^^^^^^
-    ## Use execute if you would like the robot to follow
-    ## the plan that has already been computed:
+    ## 既に計算された計画をロボットにさせたければ，execute を行ってください:
     move_group.execute(plan, wait=True)
 
-    ## **Note:** The robot's current joint state must be within some tolerance of the
-    ## first waypoint in the `RobotTrajectory`_ or ``execute()`` will fail
+    ## **アナウンス:** ロボットの現在の関節は
+    ## `RobotTrajectory`_ にある最初の中継点の間になければ， ``execute()`` は失敗に終わります．
     ## END_SUB_TUTORIAL
 
 
@@ -318,15 +312,14 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL wait_for_scene_update
     ##
-    ## Ensuring Collision Updates Are Received
+    ## 衝突の更新がされているか確かにする
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## If the Python node dies before publishing a collision object update message, the message
-    ## could get lost and the box will not appear. To ensure that the updates are
-    ## made, we wait until we see the changes reflected in the
-    ## ``get_attached_objects()`` and ``get_known_object_names()`` lists.
-    ## For the purpose of this tutorial, we call this function after adding,
-    ## removing, attaching or detaching an object in the planning scene. We then wait
-    ## until the updates have been made or ``timeout`` seconds have passed
+    ## 障害物メッセージの更新を実行する前にPythonノードが失敗したならば，the message
+    ## メッセージは失われ立方体は現れません．更新されたことを確かにするためには
+    ## ``get_attached_objects()`` と ``get_known_object_names()`` のリストに変更がなされるまで待ちます．
+    ## このチュートリアルの目的として，このfunctionは
+    ## planningで物体を追加・除去・取り付け/外しをした後に呼び出します．
+    ## なので更新されるまでか， ``timeout`` で設定された時間が過ぎるまで待ちます．
     start = rospy.get_time()
     seconds = rospy.get_time()
     while (seconds - start < timeout) and not rospy.is_shutdown():
@@ -360,9 +353,9 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL add_box
     ##
-    ## Adding Objects to the Planning Scene
+    ## Planning系に物体を追加する
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## First, we will create a box in the planning scene at the location of the left finger:
+    ## まずPlanning系の左指の位置に立方体を作ります:
     box_pose = geometry_msgs.msg.PoseStamped()
     box_pose.header.frame_id = "panda_leftfinger"
     box_pose.pose.orientation.w = 1.0
@@ -389,14 +382,14 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL attach_object
     ##
-    ## Attaching Objects to the Robot
+    ## ロボットに物体を取り付ける
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## Next, we will attach the box to the Panda wrist. Manipulating objects requires the
-    ## robot be able to touch them without the planning scene reporting the contact as a
-    ## collision. By adding link names to the ``touch_links`` array, we are telling the
-    ## planning scene to ignore collisions between those links and the box. For the Panda
-    ## robot, we set ``grasping_group = 'hand'``. If you are using a different robot,
-    ## you should change this value to the name of your end effector group name.
+    ## 次に，Pandaの手首に立方体を取り付けます．物体の操作には
+    ## planningの段階で衝突として表示されていない状態で，物体に触れることができる必要があります．
+    ## 一覧に ``touch_links`` というlinkの名前を加えることで,
+    ## planning系にそれらのリンクと物体間での衝突を無視するように設定します．
+    ## Pandaロボットには， ``grasping_group = 'hand'`` を設定してあります．他のロボットを使う際には，
+    ## エンドエフェクタのgroup nameをそのロボットの名前に変更してください
     grasping_group = 'hand'
     touch_links = robot.get_link_names(group=grasping_group)
     scene.attach_box(eef_link, box_name, touch_links=touch_links)
@@ -416,9 +409,9 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL detach_object
     ##
-    ## Detaching Objects from the Robot
+    ## ロボットから物体を取り外す
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## We can also detach and remove the object from the planning scene:
+    ## ロボットから物体を取り外し，消すことも可能です:
     scene.remove_attached_object(eef_link, name=box_name)
     ## END_SUB_TUTORIAL
 
@@ -435,13 +428,12 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     ## BEGIN_SUB_TUTORIAL remove_object
     ##
-    ## Removing Objects from the Planning Scene
+    ## 物体をplanning系から消す
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## We can remove the box from the world.
+    ## 計画から物体を消すことができます．
     scene.remove_world_object(box_name)
 
-    ## **Note:** The object must be detached before we can remove it from the world
-    ## END_SUB_TUTORIAL
+    ## **アナウンス:** 物体を消す前にロボットから取り外さなければなりません．    ## END_SUB_TUTORIAL
 
     # We wait for the planning scene to update.
     return self.wait_for_state_update(box_is_attached=False, box_is_known=False, timeout=timeout)
