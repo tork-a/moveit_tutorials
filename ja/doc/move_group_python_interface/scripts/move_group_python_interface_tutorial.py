@@ -313,7 +313,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## BEGIN_SUB_TUTORIAL wait_for_scene_update
     ##
     ## 衝突の更新がされているか確かにする
-    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ## 障害物メッセージの更新を実行する前にPythonノードが失敗したならば，the message
     ## メッセージは失われ立方体は現れません．更新されたことを確かにするためには
     ## ``get_attached_objects()`` と ``get_known_object_names()`` のリストに変更がなされるまで待ちます．
