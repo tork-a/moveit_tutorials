@@ -90,10 +90,10 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## 運動学モデルと現在の関節の情報を提供してくれます
     robot = moveit_commander.RobotCommander()
 
-    ## オブジェクト `PlanningSceneInterface`_ を生成します．これはロボットを取り巻く内部環境を理解するために必要な情報を得る・設定する・変更するのに必要な遠隔インタフェースを提供してくれます:
+    ## オブジェクト `PlanningSceneInterface`_ を生成します．これはロボットを取り巻く環境を理解するために必要な情報を得る・設定する・変更するのに必要な遠隔インタフェースを提供してくれます:
     scene = moveit_commander.PlanningSceneInterface()
 
-    ## Instantiate オブジェクト `MoveGroupCommander`_ を生成します．このオブジェクトはplanning group（ジョイント群）のためのインタフェースです．
+    ## `MoveGroupCommander`_ オブジェクトを初期化します．このオブジェクトはplanning group（関節グループ）のためのインタフェースです．
     ## このチュートリアルではplanning groupはPandaの一番はじめの腕の関節であるので，
     ## planning groupの名前は "panda_arm" としてあります．
     ## もし他のロボットを利用する際には，今回変更してあるplanning groupの名前をそのロボットの名前に変更してください．
@@ -101,7 +101,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     group_name = "panda_arm"
     move_group = moveit_commander.MoveGroupCommander(group_name)
 
-    ## Rvizで軌道を表すための
+    ## Rvizで軌道を表示するための
     ## `DisplayTrajectory`_ ROS publisher を作ります:
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
@@ -117,16 +117,15 @@ class MoveGroupPythonIntefaceTutorial(object):
     planning_frame = move_group.get_planning_frame()
     print "============ Planning frame: %s" % planning_frame
 
-    # We can also print the name of the end-effector link for this group:
+    # このグループのエンドエフェクタのリンクの名前を表示します:
     eef_link = move_group.get_end_effector_link()
     print "============ End effector link: %s" % eef_link
 
-    # We can get a list of all the groups in the robot:
+    # ロボットのすべてのグループのリストを取得します:
     group_names = robot.get_group_names()
     print "============ Available Planning Groups:", robot.get_group_names()
 
-    # Sometimes for debugging it is useful to print the entire state of the
-    # robot:
+    # ロボットの現在状態を表示しておくとて，デバッグがしやすくなります．
     print "============ Printing robot state"
     print robot.get_current_state()
     print ""
@@ -153,9 +152,9 @@ class MoveGroupPythonIntefaceTutorial(object):
     ##
     ## 目標関節角度への計画
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## Pandaのゼロ・コンフィギュレーションは，特異姿勢 <https://www.quora.com/Robotics-What-is-meant-by-kinematic-singularity>_ になった際に起こります．
+    ## Pandaのゼロ・コンフィギュレーションは， `特異姿勢 <https://www.quora.com/Robotics-What-is-meant-by-kinematic-singularity>`_ になった際に起こります．
     ## なので，まずはこの姿勢を回避するようにPandaを動かします．
-    # We can get the joint values from the group and adjust some of the values:
+    # 関節角をグループから取得し，それらのいくつかを調整します:
     joint_goal = move_group.get_current_joint_values()
     joint_goal[0] = 0
     joint_goal[1] = -pi/4
@@ -165,11 +164,11 @@ class MoveGroupPythonIntefaceTutorial(object):
     joint_goal[5] = pi/3
     joint_goal[6] = 0
 
-    # The go command can be called with joint values, poses, or without any
-    # parameters if you have already set the pose or joint target for the group
+    # goコマンドは関節角や姿勢を引数に取って実行するか，予めグループの姿勢や関節のパラメータを設定しておけば，
+    # 引数なしで実行することもできます．
     move_group.go(joint_goal, wait=True)
 
-    # Calling ``stop()`` ensures that there is no residual movement
+    # stop() を呼び出すことで，残りの動作がないことを保証します
     move_group.stop()
 
     ## END_SUB_TUTORIAL
@@ -203,8 +202,8 @@ class MoveGroupPythonIntefaceTutorial(object):
     plan = move_group.go(wait=True)
     # stop() を呼び出すことで，残りの動作がないことを保証します．
     move_group.stop()
-    # It is always good to clear your targets after planning with poses.
-    # Note: there is no equivalent function for clear_joint_value_targets()
+    # 姿勢を計画したら毎回ターゲットを消すようにしましょう.
+    # Note: clear_joint_value_targets() と同じような関数は他にありません
     move_group.clear_pose_targets()
 
     ## END_SUB_TUTORIAL
@@ -227,32 +226,31 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## 直動軌道
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ## エンドエフェクタの経路座標を明示することで直接直動軌道を計画することができます．
-    ## もし，Python シェルを使って対話的に実行する場合には， set scale = 1.0 と設定してください．
+    ## もし，Python シェルを使って対話的に実行する場合には, ``scale = 1.0`` と設定してください．
     ##
     waypoints = []
 
     wpose = move_group.get_current_pose().pose
-    wpose.position.z -= scale * 0.1  # First move up (z)
-    wpose.position.y += scale * 0.2  # and sideways (y)
+    wpose.position.z -= scale * 0.1  # はじめにはｚ方向に振り上げ
+    wpose.position.y += scale * 0.2  # そしてｙ軸と水平に動く
     waypoints.append(copy.deepcopy(wpose))
 
-    wpose.position.x += scale * 0.1  # Second move forward/backwards in (x)
+    wpose.position.x += scale * 0.1  # 次にｘ軸に沿って前後に動く
     waypoints.append(copy.deepcopy(wpose))
 
-    wpose.position.y -= scale * 0.1  # Third move sideways (y)
+    wpose.position.y -= scale * 0.1  # 最後にｙ軸と水平に動く
     waypoints.append(copy.deepcopy(wpose))
 
-    # We want the Cartesian path to be interpolated at a resolution of 1 cm
-    # which is why we will specify 0.01 as the eef_step in Cartesian
-    # translation.  We will disable the jump threshold by setting it to 0.0,
-    # ignoring the check for infeasible jumps in joint space, which is sufficient
-    # for this tutorial.
+    # 直動動作を1cmに区切りたいため，直動動作への変換最大ステップ（ `eef_step` ）を0.01に設定しています．
+    # `jump_threshold` を0.0に設定しているのは，各ステップを飛ばさないように設定するためです．
+    # **警告：ジャンプ閾値を無効にすると，冗長関節を持つロボットの場合は予測不可能な動作を起こし，
+    # 危険な動作が起きる可能性があるので十分注意してください．
     (plan, fraction) = move_group.compute_cartesian_path(
                                        waypoints,   # waypoints to follow
                                        0.01,        # eef_step
                                        0.0)         # jump_threshold
 
-    # Note: We are just planning, not asking move_group to actually move the robot yet:
+    # Note: 今の段階ではロボットの動作を計画しただけであって，実際に動かしたわけではない:
     return plan, fraction
 
     ## END_SUB_TUTORIAL
@@ -273,7 +271,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## group.plan() method は自動的にこの作業を行ってくれるので，ここではあまり重要なことではありませんが
     ## 頭の片隅に留めておいてください（下記のコードは再度同じ経路を示しているだけです）:
     ##
-    ## `DisplayTrajectory`_ msg には trajectory_start と trajectory というメンバがあります．
+    ## `DisplayTrajectory`_ メッセージには trajectory_start と trajectory というメンバがあります．
     ## trajectory_start には通常，AttachedCollisionObjects (ロボットに取り付けた衝突物体)の情報を含む現在の
     ## ロボットの状態をコピーし，trajectory には生成したパス(軌道)をコピーします．
     display_trajectory = moveit_msgs.msg.DisplayTrajectory()
@@ -313,11 +311,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## BEGIN_SUB_TUTORIAL wait_for_scene_update
     ##
     ## 衝突の更新がされているか確かめる
-<<<<<<< HEAD
     ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-=======
-    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>>>>>> c769fb158dd4c0f761a5cab60619faa7ec3f06a4
     ## 障害物メッセージの更新を実行する前にPythonノードが失敗したならば，
     ## メッセージは失われ立方体は現れません．更新されたことを確かめるには
     ## ``get_attached_objects()`` と ``get_known_object_names()`` のリストに変更があるまで待ちます．
@@ -327,23 +321,23 @@ class MoveGroupPythonIntefaceTutorial(object):
     start = rospy.get_time()
     seconds = rospy.get_time()
     while (seconds - start < timeout) and not rospy.is_shutdown():
-      # Test if the box is in attached objects
+      # 立方体が物体と触れているか確かめます
       attached_objects = scene.get_attached_objects([box_name])
       is_attached = len(attached_objects.keys()) > 0
 
-      # Test if the box is in the scene.
-      # Note that attaching the box will remove it from known_objects
+      # 立方体が環境にあるか確かめて行きます．
+      # ロボットに立方体を取り付けるとknown_objectsから削除されていることを確認してください．
       is_known = box_name in scene.get_known_object_names()
 
-      # Test if we are in the expected state
+      # ここまでの手順をしっかり踏んでいるか確認します
       if (box_is_attached == is_attached) and (box_is_known == is_known):
         return True
 
-      # Sleep so that we give other threads time on the processor
+      # 他のスレッドを更新するために待機します
       rospy.sleep(0.1)
       seconds = rospy.get_time()
 
-    # If we exited the while loop without returning then we timed out
+    # 返り値を返さずにループを抜けたら，タイムアウトなのでFalseを返します．
     return False
     ## END_SUB_TUTORIAL
 
@@ -363,7 +357,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     box_pose = geometry_msgs.msg.PoseStamped()
     box_pose.header.frame_id = "panda_leftfinger"
     box_pose.pose.orientation.w = 1.0
-    box_pose.pose.position.z = 0.07 # slightly above the end effector
+    box_pose.pose.position.z = 0.07 # エンドエフェクタから少し離す
     box_name = "box"
     scene.add_box(box_name, box_pose, size=(0.1, 0.1, 0.1))
 

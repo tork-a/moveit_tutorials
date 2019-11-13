@@ -41,7 +41,7 @@ RViz上で, 下記のことができているか確認します:
 
 Pythonコードの中身
 ----------------------------------------------
-Note: 今回のpythonコードはまとめて :codedir:`チュートリアルのGitHubレポジトリはここ<move_group_python_interface/scripts/move_group_python_interface_tutorial.py>` で見られます．
+Note: 今回のpythonコードはまとめて :codedir:`チュートリアルのGitHubレポジトリ<move_group_python_interface/scripts/move_group_python_interface_tutorial.py>` で見られます．
 
 .. tutorial-formatter:: ./scripts/move_group_python_interface_tutorial.py
 
