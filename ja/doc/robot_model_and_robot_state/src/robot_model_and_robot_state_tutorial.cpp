@@ -48,22 +48,18 @@ int main(int argc, char** argv)
   spinner.start();
 
   // BEGIN_TUTORIAL
-  // Start
-  // ^^^^^
-  // Setting up to start using the RobotModel class is very easy. In
-  // general, you will find that most higher-level components will
-  // return a shared pointer to the RobotModel. You should always use
-  // that when possible. In this example, we will start with such a
-  // shared pointer and discuss only the basic API. You can have a
-  // look at the actual code API for these classes to get more
-  // information about how to use more features provided by these
-  // classes.
+  // まず
+  // ^^^^^^^^^^^^
+  // 始めるにあたって :moveit_core:`RobotModel` クラスを使ってセットアップすると簡単です．
+  // 一般的に，
+  // :moveit_core:`RobotModel` クラスにsharedポインタを返すものが最も難しいです．
+  // 可能であるならばいつもそちらを使ったほうがいいです．今回の例では上記のようなsharedポインタから始めて，
+  // 基本的なAPIについてのみ触れます．
+  // 実際のAPIのコードのクラスを見ることで，これらのクラスによって与えられる特性の利用方法についての情報を得られます． 
   //
-  // We will start by instantiating a
-  // `RobotModelLoader`_
-  // object, which will look up
-  // the robot description on the ROS parameter server and construct a
-  // :moveit_core:`RobotModel` for us to use.
+  // ROSパラメータサーバでロボットの状態を調べ，
+  // :moveit_core:`RobotModel` クラスを構築する
+  // `RobotModelLoader`_ オブジェクトをまずインスタンス化します．
   //
   // .. _RobotModelLoader:
   //     http://docs.ros.org/melodic/api/moveit_ros_planning/html/classrobot__model__loader_1_1RobotModelLoader.html
@@ -71,22 +67,21 @@ int main(int argc, char** argv)
   robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
   ROS_INFO("Model frame: %s", kinematic_model->getModelFrame().c_str());
 
-  // Using the :moveit_core:`RobotModel`, we can construct a
-  // :moveit_core:`RobotState` that maintains the configuration
-  // of the robot. We will set all joints in the state to their
-  // default values. We can then get a
-  // :moveit_core:`JointModelGroup`, which represents the robot
-  // model for a particular group, e.g. the "panda_arm" of the Panda
-  // robot.
+  // :moveit_core:`RobotModel` を使うと，
+  // ロボットのコンフィグレーションを維持してくれる :moveit_core:`RobotState` を構築できます．
+  // state内にすべてのデフォルトの関節角を記録します．
+  // すると
+  // 特定のグループのロボットモデルを表示する，
+  // 本チュートリアルではPandaロボットの ``panda_arm`` ， :moveit_core:`JointModelGroup` を得ることが出来ます．
   robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
   kinematic_state->setToDefaultValues();
   const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("panda_arm");
 
   const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
-  // Get Joint Values
-  // ^^^^^^^^^^^^^^^^
-  // We can retreive the current set of joint values stored in the state for the Panda arm.
+  // 関節角を求める
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // Panda armの状態に記録されている現在の関節角の情報を受け取ります．
   std::vector<double> joint_values;
   kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
   for (std::size_t i = 0; i < joint_names.size(); ++i)
@@ -94,45 +89,43 @@ int main(int argc, char** argv)
     ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
   }
 
-  // Joint Limits
-  // ^^^^^^^^^^^^
-  // setJointGroupPositions() does not enforce joint limits by itself, but a call to enforceBounds() will do it.
-  /* Set one joint in the Panda arm outside its joint limit */
+  // 限界関節角
+  // ^^^^^^^^^^^^^^^^^^^^^^^^
+  // ``setJointGroupPositions()`` は関数自身では限界関節角を設定しませんが， ``enforceBounds()`` を呼び出すことで変わりに行います．
+  /* Panda armの関節の一つを限界関節角から外してください */
   joint_values[0] = 5.57;
   kinematic_state->setJointGroupPositions(joint_model_group, joint_values);
 
-  /* Check whether any joint is outside its joint limits */
+  /* 他の関節が限界関節角から外れているかどうか確認してください */
   ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
 
-  /* Enforce the joint limits for this state and check again*/
+  /* 限界関節角を設定し，確認してください */
   kinematic_state->enforceBounds();
   ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
 
-  // Forward Kinematics
-  // ^^^^^^^^^^^^^^^^^^
-  // Now, we can compute forward kinematics for a set of random joint
-  // values. Note that we would like to find the pose of the
-  // "panda_link8" which is the most distal link in the
-  // "panda_arm" group of the robot.
+  // Forward Kinematics（順運動学）
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // ここではわかっていない関節角を求めるために，forward kinematicsを計算します．
+  // ``panda_arm`` の内で最もエンドエフェクタから遠い ``panda_link8`` の姿勢を求めます．
   kinematic_state->setToRandomPositions(joint_model_group);
   const Eigen::Isometry3d& end_effector_state = kinematic_state->getGlobalLinkTransform("panda_link8");
 
-  /* Print end-effector pose. Remember that this is in the model frame */
+  /* エンドエフェクタの姿勢を表示する．これはモデルフレームであることは留意しておいてください */
   ROS_INFO_STREAM("Translation: \n" << end_effector_state.translation() << "\n");
   ROS_INFO_STREAM("Rotation: \n" << end_effector_state.rotation() << "\n");
 
-  // Inverse Kinematics
-  // ^^^^^^^^^^^^^^^^^^
-  // We can now solve inverse kinematics (IK) for the Panda robot.
-  // To solve IK, we will need the following:
+  // Inverse Kinematics（逆運動学）
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // ここではPandaロボットのinverse kinematics (IK)を求めます．
+  // IKを解くには，下記のものが必要となります:
   //
-  //  * The desired pose of the end-effector (by default, this is the last link in the "panda_arm" chain):
-  //    end_effector_state that we computed in the step above.
-  //  * The timeout: 0.1 s
+  //  * 任意のエンドエフェクタの姿勢（通常， ``panda_arm`` チェーンの最後のリンク） :
+  //    上記のステップで計算された ``end_effector_state`` のこと．
+  //  * タイムアウト: 0.1 s
   double timeout = 0.1;
   bool found_ik = kinematic_state->setFromIK(joint_model_group, end_effector_state, timeout);
 
-  // Now, we can print out the IK solution (if found):
+  // （解があるならば）IK解を出力できるようになりました:
   if (found_ik)
   {
     kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
@@ -146,9 +139,9 @@ int main(int argc, char** argv)
     ROS_INFO("Did not find IK solution");
   }
 
-  // Get the Jacobian
-  // ^^^^^^^^^^^^^^^^
-  // We can also get the Jacobian from the :moveit_core:`RobotState`.
+  // ヤコビアンを求める
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // :moveit_core:`RobotState` からヤコビアンを取得できます．
   Eigen::Vector3d reference_point_position(0.0, 0.0, 0.0);
   Eigen::MatrixXd jacobian;
   kinematic_state->getJacobian(joint_model_group,
