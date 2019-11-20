@@ -9,7 +9,7 @@ Motion Planner Plugin
 
 .. image:: lerp_motion_planner/lerp_planner.png
 
-まず、``moveit_tutorials`` packageの中にプラグインを作成します。プラグインクラス ``lerp`` を作成するためには、フォルダ ``src`` の中に、 ``lerp_planner_manager.cpp`` という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager`` は ``planning_interface`` から ``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、 ``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは ``class_loader`` から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます: ::
+まず、``moveit_tutorials`` packageの中にプラグインを作成します。プラグインクラス ``lerp`` を作成するためには、フォルダ ``src`` の中に、 ``lerp_planner_manager.cpp`` という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager`` は ``planning_interface`` から ``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、 ``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは ``class_loader`` から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます。 ::
 
   CLASS_LOADER_REGISTER_CLASS(emptyplan_interface::EmptyPlanPlannerManager, planning_interface::PlannerManager);
 
@@ -20,7 +20,7 @@ Motion Planner Plugin
 Export the plugin
 ^^^^^^^^^^^^^^^^^^
 
-最初に、プラグインをROSのツールチェーンで利用できるようにする必要があります。そのためには、plugin description xml file(``emptyplan_interface_plugin_description.xml``)を作成する必要があります。このファイルには、ライブラリタグがオプション設定と一緒に記載されています: ::
+最初に、プラグインをROSのツールチェーンで利用できるようにする必要があります。そのためには、plugin description xml file(``emptyplan_interface_plugin_description.xml``)を作成する必要があります。このファイルには、ライブラリタグがオプション設定と一緒に記載されています。 ::
 
   <library  path="libmoveit_emptyplan_planner_plugin">
     <class name="emptyplan_interface/EmptyPlanPlanner" type="emptyplan_interface::EmptyPlanPlannerManager" base_class_type="planning_interface::PlannerManager">
@@ -29,7 +29,7 @@ Export the plugin
     </class>
   </library>
 
-そして、プラグインをエクスポートするには、上のxmlファイルのアドレスとpackage.xmlファイルの ``export`` タグを使います: ::
+そして、プラグインをエクスポートするには、上のxmlファイルのアドレスとpackage.xmlファイルの ``export`` タグを使います。 ::
 
  <export>
     <moveit_core plugin="${prefix}/emptyplan_interface_plugin_description.xml"/>
@@ -40,32 +40,32 @@ Export the plugin
 Check the plugin
 ^^^^^^^^^^^^^^^^^
 
-次のコマンドによって、新しいプラグインが正しく作成され、エクスポートされたか確認できます: ::
+次のコマンドによって、新しいプラグインが正しく作成され、エクスポートされたか確認できます。 ::
 
   rospack plugins --attrib=plugin moveit_core
 
-この結果は ``moveit_planners_lerp`` にplugin description xmlファイルのアドレスと一緒に含まれる必要があります: ::
+この結果は ``moveit_planners_lerp`` にplugin description xmlファイルのアドレスと一緒に含まれる必要があります。 ::
 
   moveit_tutorials <ros_workspace>/src/moveit_tutorials/creating_moveit_plugins/lerp_motion_planner/lerp_interface_plugin_description.xml
 
 Plugin usage
 ^^^^^^^^^^^^^
 
-この章では、先ほど作成したlerp plannerのロードと使い方を説明します。そのためには、 ``lerp_example.cpp`` というROSノードを作成する必要があります。最初のステップは下記のコードでリクエストされたplanning groupとthe planning sceneに関係するロボットのジョイントのグループとその状態の取得です: ::
+この章では、先ほど作成したlerp plannerのロードと使い方を説明します。そのためには、 ``lerp_example.cpp`` というROSノードを作成する必要があります。最初のステップは下記のコードでリクエストされたplanning groupとthe planning sceneに関係するロボットのジョイントのグループとその状態の取得です。 ::
 
   robot_state::RobotStatePtr robot_state(new robot_state::RobotState(robot_model));
   const robot_state::JointModelGroup* joint_model_group = robot_state->getJointModelGroup(PLANNING_GROUP);
   const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
   planning_scene::PlanningScenePtr planning_scene(new planning_scene::PlanningScene(robot_model));
 
-次のステップはpluinglibを使用するプランナーをロードし、パラメータ ``planner_plugin_name`` を先ほど作成した物に設定することです: ::
+次のステップはpluinglibを使用するプランナーをロードし、パラメータ ``planner_plugin_name`` を先ほど作成した物に設定することです。 ::
 
     boost::scoped_ptr<pluginlib::ClassLoader<planning_interface::PlannerManager>> planner_plugin_loader;
     planning_interface::PlannerManagerPtr planner_instance;
     std::string planner_plugin_name =  "lerp_interface/LERPPlanner";
     node_handle.setParam("planning_plugin", planner_plugin_name);
 
-プランナーをロードしたら、モーションプラニングのスタートとゴールの状態を設定します。スタート状態は、 ``req.start_state`` で設定されたロボットの現在の状態です。反対に、ゴール制約はゴールの状態とジョイントモデルグループを使用して ``moveit_msgs::Constraints`` を作ることによって設定されます。この制約は ``req.goal_constraint`` に与えられます。次のコードはそれらを実施する方法を示しています: ::
+プランナーをロードしたら、モーションプラニングのスタートとゴールの状態を設定します。スタート状態は、 ``req.start_state`` で設定されたロボットの現在の状態です。反対に、ゴール制約はゴールの状態とジョイントモデルグループを使用して ``moveit_msgs::Constraints`` を作ることによって設定されます。この制約は ``req.goal_constraint`` に与えられます。次のコードはそれらを実施する方法を示しています。 ::
 
   // Get the joint values of the start state and set them in request.start_state
   std::vector<double> start_joint_values;
@@ -80,7 +80,7 @@ Plugin usage
   req.goal_constraints.clear();
   req.goal_constraints.push_back(joint_goal);
 
-これまでプランナーをロードし、スタートとゴールの状態を作成しましたが、まだモーションプラニングの問題を解いていません。スタートとゴールの状態について与えられた情報によって、ジョイントの状態の中でモーションプラニング問題は、 ``PlanningContext`` インスタンスを作成し、そのsolve functionをCallすることで実行されます。このsolve functionに渡される応答は ``planning_interface::MotionPlanResponse`` タイプということを覚えといてください: ::
+これまでプランナーをロードし、スタートとゴールの状態を作成しましたが、まだモーションプラニングの問題を解いていません。スタートとゴールの状態について与えられた情報によって、ジョイントの状態の中でモーションプラニング問題は、 ``PlanningContext`` インスタンスを作成し、そのsolve functionをCallすることで実行されます。このsolve functionに渡される応答は ``planning_interface::MotionPlanResponse`` タイプということを覚えといてください。 ::
 
     planning_interface::PlanningContextPtr context = planner_instance->getPlanningContext(planning_scene, req, res.error_code_);
 
