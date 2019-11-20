@@ -5,7 +5,7 @@ Creating Moveit Plugins
 
 Motion Planner Plugin
 ----------------------
-この章では、motion plannerをMoveitのプラグインとして追加する方法を説明します。Moveitのこのbase classは全ての新しいプラグインが継承する``planning_interface``です。ここでは例として、2状態のモーションプランを生成するlinear interpolation planner (lerp)を作成します。このプランナーは新しいプランナーを追加する上で必要な基本要素を全て含んでいるため、スタートポイントとして使うことができます。下記の図は新しいプランナーをMoveitに追加することに関連する、各class間の関係の概要を示しています。
+この章では、motion plannerをMoveitのプラグインとして追加する方法を説明します。Moveitのこのbase classは全ての新しいプラグインが継承する ``planning_interface``です。ここでは例として、2状態のモーションプランを生成するlinear interpolation planner (lerp)を作成します。このプランナーは新しいプランナーを追加する上で必要な基本要素を全て含んでいるため、スタートポイントとして使うことができます。下記の図は新しいプランナーをMoveitに追加することに関連する、各class間の関係の概要を示しています。
 
 .. image:: lerp_motion_planner/lerp_planner.png
 
