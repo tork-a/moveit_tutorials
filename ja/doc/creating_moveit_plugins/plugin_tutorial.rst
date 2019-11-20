@@ -1,27 +1,26 @@
 Creating Moveit Plugins
 ========================
-`This Page <http://wiki.ros.org/pluginlib>`_ gives a detailed explanantion of how to add plugins in ROS in general. The two necessary elements are base and plugin classes. The plugin class inherits from the base class and overrides its virtual functions. The main library used for this purpose in pluginlib. This tutorials contains three different types of plugins, namely, motion planner, controller manager and constriant sampler plugin.
+`このページ <http://wiki.ros.org/pluginlib>`_ ではROS general にPluginを追加する方法を説明します。Pluginを作成する上で必要な要素は、BaseとPlugin classです。Plugin Classは base classを継承し、仮想関数をオーバーライドします。このチュートリアルは異なる３種類のプラグイン（motion planner, controller manager, constraint sampler plugin)が含まれます。
 
 
 Motion Planner Plugin
 ----------------------
-In this section, we will show how to add a new motion planner to MoveIt as a plugin. The base class in MoveIt is ``planning_interface`` from  which any new planner plugin should inherit. For domonstration purposes, a linear interpolation planner (lerp) which plans the motion between two states in joint space is created. This planner could be used as a start point for adding any new planner as it contains the neccessary basics. The following graph shows a brief overall view of the relation between classes for adding a new planner in MoveIt.
+この章では、motion plannerをMoveitのプラグインとして追加する方法を説明します。Moveitのこのbase classは全ての新しいプラグインが継承する ``planning_interface`` です。ここでは例として、joint spaceの2つの状態のモーションプランを生成するlinear interpolation planner (lerp)を作成します。このプランナーは新しいプランナーを追加する上で必要な基本要素を全て含んでいるため、スタートポイントとして使うことができます。下記の図は新しいプランナーをMoveitに追加することに関連する、各クラス間の関係の概要を示しています。
 
 .. image:: lerp_motion_planner/lerp_planner.png
 
-We create the plugin in  ``moveit_tutorials`` package. To make the plugin class for ``lerp``, create a file named ``lerp_planner_manager.cpp`` in src folder. In this file, ``LERPPlanPlannerManager`` overrides the functions of ``PlannerManager`` class from ``planning_interface``. In the end of this file, we need to register ``LERPPlanPlannerManager`` class as a plugin, this is done by ``CLASS_LOADER_REGISTER_CLASS`` macro from ``class_loader``: ::
+まず、``moveit_tutorials`` packageの中にプラグインを作成します。``lerp`` のためのプラグインクラス を作成するためには、フォルダ ``src`` の中に、 ``lerp_planner_manager.cpp`` という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager`` は ``planning_interface`` から ``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、 ``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは ``class_loader`` から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます。 ::
 
   CLASS_LOADER_REGISTER_CLASS(emptyplan_interface::EmptyPlanPlannerManager, planning_interface::PlannerManager);
 
-``LERPPlanningContext`` is the class that overrides the functinos of ``PlanningContext``. This class contains the solve function where the planner solves the problem and returns the solution. As the solve function may need many classes from the planner code base, it is more officient and organized to make another class called ``lerp_interface`` where the actual implementation of the planner solve method takes place. Basically, this class is the entry point to the new motion planner algorithm. The reponse in this solve function is prepared in the type of ``moveit_msgs::MotionPlanDetailedResponse`` which is converted to ``planning_interface::MotionPlanDetailedResponse`` in ``LERPPlanningContext`` class.
+``LERPPlanningContext`` は ``PlanningContext`` の関数をオーバーライドするクラスです。このクラスはプランナーが問題を解き結果を返すsolve functionを含みます。solve functionはプランナーのソースコードから多くのクラスを必要とする可能性があるため、実際のプランナーのsolve methodが実際に実装される ``lerp_interface`` を呼び出す他のクラスを作る方が効率的です。基本的に、このクラスは新しいモーションプランアルゴリズムのためのエントリーポイントです。このsolve functionの応答は ``LERPPlanningContext`` クラスで ``planning_interface::MotionPlanDetailedResponse`` タイプに変換される ``moveit_msgs::MotionPlanDetailedResponse`` タイプで準備されます。
 
-Moreover, ``PlannerConfigurationSettings`` could be used to pass the planner-specific paramters. Another way to pass these parametes is using ROS param server which reads from a yaml file. In this tutorial, for out lerp planner, we use a lerp_planning.yaml in ``panda_moveit_config`` package that contains only one paramete, ``num_steps`` which gets loaded in ``lerp_interface`` whenever its solve function is called.
-
+更に、 ``PlannerConfigurationSettings`` はプランナーにパラメータを渡すためにも使われます。パラメータを渡す他の方法にはyamlファイルからパラメータを読み込むROSパラメータサーバーを使う方法があります。このチュートリアルでは、solve functionがCallされた時にロードされる ``lerp_interface`` に記載されている ``num_steps`` だけを持つ ``panda_moveit_config`` パッケージの ``lerp_planning.yaml`` を使用します。
 
 Export the plugin
 ^^^^^^^^^^^^^^^^^^
 
-First, we need to make the plugin available to the ROS Toolchain. To this end, a plugin description xml file (``emptyplan_interface_plugin_description.xml``) containing the ``library`` tag with the following options should be created: ::
+最初に、プラグインをROSのツールチェーンで利用できるようにする必要があります。そのためには、plugin description xml file(``emptyplan_interface_plugin_description.xml``)を作成する必要があります。このファイルには、ライブラリタグがオプション設定と一緒に記載されています。 ::
 
   <library  path="libmoveit_emptyplan_planner_plugin">
     <class name="emptyplan_interface/EmptyPlanPlanner" type="emptyplan_interface::EmptyPlanPlannerManager" base_class_type="planning_interface::PlannerManager">
@@ -30,42 +29,43 @@ First, we need to make the plugin available to the ROS Toolchain. To this end, a
     </class>
   </library>
 
-Then, to export the plugin, we use the address of the above xml file and the ``export`` tag in package.xml file: ::
+そして、プラグインをエクスポートするには、上のxmlファイルのアドレスとpackage.xmlファイルの ``export`` タグを使います。 ::
 
  <export>
     <moveit_core plugin="${prefix}/emptyplan_interface_plugin_description.xml"/>
  </export>
 
-Note that the name of the tag, ``moveit_core``, is the same as that of the package where the base class, ``planning_interface``, lives in.
+注：タグの名前 ``moveit_core`` はbase classである ``planning_interface`` が存在するパッケージの名前と同じです。
 
 Check the plugin
 ^^^^^^^^^^^^^^^^^
-With the following command, one can verify if the new plugin is created and exported correctly or not: ::
+
+次のコマンドによって、新しいプラグインが正しく作成され、エクスポートされたか確認できます。 ::
 
   rospack plugins --attrib=plugin moveit_core
 
-The result should containt ``moveit_planners_lerp`` with the address of the plugin description xml file: ::
+この結果は ``moveit_planners_lerp`` にplugin description xmlファイルのアドレスと一緒に含まれる必要があります。 ::
 
   moveit_tutorials <ros_workspace>/src/moveit_tutorials/creating_moveit_plugins/lerp_motion_planner/lerp_interface_plugin_description.xml
 
 Plugin usage
 ^^^^^^^^^^^^^
 
-In this subsection, we explain how to load and use the lerp planner that we have created previously. To this end, a ros node called ``lerp_example.cpp`` is created. The first step is to get the state and  group of joints of the robot that are related to the requested planning group as well as the planning scene by the following lines of code: ::
+この章では、先ほど作成したlerp plannerのロードと使い方を説明します。そのためには、 ``lerp_example.cpp`` というROSノードを作成する必要があります。最初のステップは下記のコードでリクエストされたplanning groupとthe planning sceneに関係するロボットのジョイントのグループとその状態の取得です。 ::
 
   robot_state::RobotStatePtr robot_state(new robot_state::RobotState(robot_model));
   const robot_state::JointModelGroup* joint_model_group = robot_state->getJointModelGroup(PLANNING_GROUP);
   const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
   planning_scene::PlanningScenePtr planning_scene(new planning_scene::PlanningScene(robot_model));
 
-The next step is to load the planner using pluinglib and set the parameter ``planner_plugin_name`` to the one that we have created: ::
+次のステップはpluinglibを使用するプランナーをロードし、パラメータ ``planner_plugin_name`` を先ほど作成した物に設定することです。 ::
 
     boost::scoped_ptr<pluginlib::ClassLoader<planning_interface::PlannerManager>> planner_plugin_loader;
     planning_interface::PlannerManagerPtr planner_instance;
     std::string planner_plugin_name =  "lerp_interface/LERPPlanner";
     node_handle.setParam("planning_plugin", planner_plugin_name);
 
-Having the planner loaded, it is time to set the start and goal state for the motion planning problem. The start state is the curent state of the robot which is set to ``req.start_state``. On the other hand, the goal constraint is set by creating a ``moveit_msgs::Constraints`` using the goal state and the joint model group. This constraint is fed to ``req.goal_constraint``. The following code shows how to do these steps: ::
+プランナーをロードしたら、モーションプラニングのスタートとゴールの状態を設定します。スタート状態は、 ``req.start_state`` で設定されたロボットの現在の状態です。反対に、ゴール制約はゴールの状態とジョイントモデルグループを使用して ``moveit_msgs::Constraints`` を作ることによって設定されます。この制約は ``req.goal_constraint`` に与えられます。次のコードはそれらを実施する方法を示しています。 ::
 
   // Get the joint values of the start state and set them in request.start_state
   std::vector<double> start_joint_values;
@@ -80,26 +80,26 @@ Having the planner loaded, it is time to set the start and goal state for the mo
   req.goal_constraints.clear();
   req.goal_constraints.push_back(joint_goal);
 
-So far, we have loaded the planner and created the start and goal state for the motion planning problem but we have not solved the problem yet. Solving the motion plannig problem in the joint state by the given infromation about the start and goal state is done by creating a ``PlanningContext`` instance and call its solve function. Remember that the response passed to this solve function should be of type ``planning_interface::MotionPlanResponse``: ::
+これまでプランナーをロードし、スタートとゴールの状態を作成しましたが、まだモーションプラニングの問題を解いていません。スタートとゴールの状態について与えられた情報によって、ジョイントの状態の中でモーションプラニング問題は、 ``PlanningContext`` インスタンスを作成し、そのsolve functionをCallすることで実行されます。このsolve functionに渡される応答は ``planning_interface::MotionPlanResponse`` タイプということを覚えといてください。 ::
 
     planning_interface::PlanningContextPtr context = planner_instance->getPlanningContext(planning_scene, req, res.error_code_);
 
-Finally, to run this node, we need to roslaunch lerp_example.launch in launch folder. This launch file launches the ``demo.launch`` of package ``panda_moveit_config`` by passing ``lerp`` as the name of the planner. Then, ``lerp_example`` gets launched and ``lerp_planning.yaml`` is loaded to set the lerp-specfic parameters to ROS Parameter Server.
+最後に、このノードを実行するため、launchフォルダーでlerp_example.launchをroslaunchする必要があります。このlaunchファイルは ``lerp`` をプランナーの名前として渡すことによって、パッケージ ``panda_moveit_config`` の ``demo.launch`` を立ち上げます。その後、 ``lerp_example`` が立ち上がり、lerpのパラメータをROS Parameter Serverに設定するため ``lerp_planning.yaml`` はロードされます。
 
 Example Controller Manager Plugin
 ----------------------------------
 
-MoveIt controller managers, somewhat a misnomer, are the interfaces to your custom low level controllers. A better way to think of them are *controler interfaces*. For most use cases, the included :moveit_codedir:`MoveItSimpleControllerManager <moveit_plugins/moveit_simple_controller_manager>` is sufficient if your robot controllers already provide ROS actions for FollowJointTrajectory. If you use *ros_control*, the included :moveit_codedir:`MoveItRosControlInterface <moveit_plugins/moveit_ros_control_interface>` is also ideal.
+MoveIt controller managers（なぜか誤った名称）は低い階層のカスタム コントローラのインターフェースです。これはコントローラインターフェースと考えた方が良いです。ほとんどのユースケースで、既にROS actionsを供給している場合、ロボットコントローラがFollowJointTrajectoryを実行にはincludeの:moveit_codedir:`MoveItSimpleControllerManager <moveit_plugins/moveit_simple_controller_manager>`が適当です。ros_controlを使用する場合も、includeの:moveit_codedir:`MoveItRosControlInterface <moveit_plugins/moveit_ros_control_interface>`が理想的です。
 
-However, for some applications you might desire a more custom controller manager. An example template for starting your custom controller manager is provided :codedir:`here <controller_configuration/src/moveit_controller_manager_example.cpp>`.
-
+しかしながら、一部のアプリケーションでは、よりカスタムされたコントローラーマネージャーが必要な場合があります。カスタムコントローラーマネージャーを起動するためのテンプレートの例をここに示します。:codedir:`<controller_configuration/src/moveit_controller_manager_example.cpp>`
 
 Example Constraint Sampler Plugin
 ----------------------------------
 
-* Create a ``ROBOT_moveit_plugins`` package and within that a sub-folder for your ``ROBOT_constraint_sampler`` plugin. Modify the template provided by ``ROBOT_moveit_plugins/ROBOT_moveit_constraint_sampler_plugin``
-* In your ``ROBOT_moveit_config/launch/move_group.launch`` file, within the ``<node name="move_group">``, add the parameter: ::
+* ``ROBOT_moveit_plugins`` パッケージを作成し、その中に ``ROBOT_moveit_plugins`` プラグインのためのサブフォルダを作成してください。そして、 ``ROBOT_moveit_plugins/ROBOT_moveit_constraint_sampler_plugin`` から提供されたテンプレートを修正してください。
+
+* ``ROBOT_moveit_config/launch/move_group.launch`` ファイルの ``<node name="move_group">`` の中にパラメータを追加してください: ::
 
   <param name="constraint_samplers" value="ROBOT_moveit_constraint_sampler/ROBOTConstraintSamplerAllocator"/>
 
-* Now when you launch move_group, it should default to your new constraint sampler.
+* move_groupを立ち上げると、それが新しい制約samplerのデフォルトになります。
