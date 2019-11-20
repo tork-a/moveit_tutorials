@@ -1,35 +1,33 @@
-Planning Scene
+プランニング環境
 ==================================
 
-The :planning_scene:`PlanningScene` class provides the main interface that you will use
-for collision checking and constraint checking. In this tutorial, we
-will explore the C++ interface to this class.
+:planning_scene:`PlanningScene` クラスは衝突や拘束条件を確認するためのメインインタフェースを提供してくれます．
+本チュートリアルでは，C++のインタフェースを用います．
 
-Getting Started
+はじめに
 ---------------
-If you haven't already done so, make sure you've completed the steps in `Getting Started <../getting_started/getting_started.html>`_.
+もしまだ済ましていなければ，まず `はじめに <../getting_started/getting_started.html>`_ から始めてください．
 
-The entire code
----------------
-The entire code can be seen :codedir:`here in the MoveIt GitHub project<planning_scene>`.
+C++コード
+------------------------
+本チュートリアルで用いられたC++コードは， :codedir:`こちらのMoveIt GitHub project<planning_scene>` で見ることが出来ます．
 
 .. tutorial-formatter:: ./src/planning_scene_tutorial.cpp
 
-The launch file
----------------
-The entire launch file is :codedir:`here <planning_scene/launch/planning_scene_tutorial.launch>` on GitHub. All the code in this tutorial can be compiled and run from the moveit_tutorials package.
+Launchファイル
+-----------------------------
+本チュートリアルで用いられたlaunchファイルは，GitHubの :codedir:`こちら <planning_scene/launch/planning_scene_tutorial.launch>` から見られます．本チュートリアルで用いられている全てのコードは，moveit_tutorialsパッケージからコンパイルできます．
 
-Running the code
-----------------
-Roslaunch the launch file to run the code directly from moveit_tutorials: ::
+コードを走らせる
+-------------------------------
+Roslaunchを用いることで，直接 ``moveit_tutorials`` からlaunchファイルのコードを走らせることができます: ::
 
- roslaunch moveit_tutorials planning_scene_tutorial.launch
+  roslaunch moveit_tutorials planning_scene_tutorial.launch
 
-Expected Output
----------------
+今回のゴール
+-------------------------
 
-The output should look something like this, though we are using random
-joint values so some things may be different. ::
+本チュートリアルでは，以下の形式で出力できることが目標です．ランダムな関節角を用いるため，数字が一致しなくても大丈夫です: ::
 
  ros.moveit_tutorials: Test 1: Current state is not in self collision
  ros.moveit_tutorials: Test 2: Current state is not in self collision
@@ -46,4 +44,4 @@ joint values so some things may be different. ::
  ros.moveit_tutorials: Test 11: Random state is feasible
  ros.moveit_tutorials: Test 12: Random state is not valid
 
-**Note:** Don't worry if your output has different ROS console format. You can customize your ROS console logger by following `this blog post <http://dav.ee/blog/notes/archives/898>`_.
+**Note:** ROSコンソールの出力形式が異なっていても安心してください．もし同じような形式にしたければ， `こちら <http://dav.ee/blog/notes/archives/898>`_ をご覧ください．

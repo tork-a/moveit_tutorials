@@ -44,11 +44,9 @@
 
 // BEGIN_SUB_TUTORIAL stateFeasibilityTestExample
 //
-// User defined constraints can also be specified to the PlanningScene
-// class. This is done by specifying a callback using the
-// setStateFeasibilityPredicate function. Here's a simple example of a
-// user-defined callback that checks whether the "panda_joint1" of
-// the Panda robot is at a positive or negative angle:
+// ユーザ定義型の拘束条件は :planning_scene:`PlanningScene` クラスでも決めることが出来ます．
+// これは ``setStateFeasibilityPredicate`` 関数を用いてコールバックを明示することで，行えます．
+// ユーザが定義したコールバックはPandaロボットの ``panda_joint1`` の値が正か負か確かめる簡単な例がこちらです:
 bool stateFeasibilityTestExample(const robot_state::RobotState& kinematic_state, bool verbose)
 {
   const double* joint_values = kinematic_state.getJointPositions("panda_joint1");
@@ -64,55 +62,50 @@ int main(int argc, char** argv)
   std::size_t count = 0;
   // BEGIN_TUTORIAL
   //
-  // Setup
-  // ^^^^^
+  // 準備
+  // ^^^^^^^^^^^^^^^
   //
-  // The :planning_scene:`PlanningScene` class can be easily setup and
-  // configured using a :moveit_core:`RobotModel` or a URDF and
-  // SRDF. This is, however, not the recommended way to instantiate a
-  // PlanningScene. The :planning_scene_monitor:`PlanningSceneMonitor`
-  // is the recommended method to create and maintain the current
-  // planning scene (and is discussed in detail in the next tutorial)
-  // using data from the robot's joints and the sensors on the robot. In
-  // this tutorial, we will instantiate a PlanningScene class directly,
-  // but this method of instantiation is only intended for illustration.
+  // :planning_scene:`PlanningScene` クラスは簡単に設定でき，
+  // :moveit_core:`RobotModel` やURDF，SRDFを用いて構成されています．
+  // しかしこれは，プランニング環境のインスタンスを生成するのに推奨されていない方法です．
+  // :planning_scene_monitor:`PlanningSceneMonitor`
+  // は，現在のロボットの関節やセンサのデータを扱っているプランニング環境の作成と維持をするのに推奨されている方法です
+  // （これに関しては次のチュートリアルで詳しく扱います）．
+  // 今回のチュートリアルでは，直接 :planning_scene:`PlanningScene` クラスをインスタンス化していますが，
+  // このインスタンス化の方法は，描画の際にのみ使われます．
 
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScene planning_scene(kinematic_model);
 
-  // Collision Checking
+  // 衝突判定
   // ^^^^^^^^^^^^^^^^^^
   //
-  // Self-collision checking
-  // ~~~~~~~~~~~~~~~~~~~~~~~
+  // 自己衝突判定
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // The first thing we will do is check whether the robot in its
-  // current state is in *self-collision*, i.e. whether the current
-  // configuration of the robot would result in the robot's parts
-  // hitting each other. To do this, we will construct a
-  // :collision_detection_struct:`CollisionRequest` object and a
-  // :collision_detection_struct:`CollisionResult` object and pass them
-  // into the collision checking function. Note that the result of
-  // whether the robot is in self-collision or not is contained within
-  // the result. Self collision checking uses an *unpadded* version of
-  // the robot, i.e. it directly uses the collision meshes provided in
-  // the URDF with no extra padding added on.
+  // まずロボットの現在の状態が *self-collision* の状態，
+  // つまりロボットのパーツが干渉しあっている状態で
+  // 構築されているかを確認します．
+  // そのため，
+  // :collision_detection_struct:`CollisionRequest` オブジェクトと
+  // :collision_detection_struct:`CollisionResult` オブジェクトを構築し，
+  // 衝突判定関数にパスを通します．ロボットが自己干渉しているかどうかは，
+  // その結果によります．自己衝突判定は，ロボットの *unpadded* バージョン，
+  // つまり新たにパディングされていないURDFから得られた衝突メッシュを直接扱います．
 
   collision_detection::CollisionRequest collision_request;
   collision_detection::CollisionResult collision_result;
   planning_scene.checkSelfCollision(collision_request, collision_result);
   ROS_INFO_STREAM("Test 1: Current state is " << (collision_result.collision ? "in" : "not in") << " self collision");
 
-  // Change the state
-  // ~~~~~~~~~~~~~~~~
+  // 状態の変更
+  // ~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // Now, let's change the current state of the robot. The planning
-  // scene maintains the current state internally. We can get a
-  // reference to it and change it and then check for collisions for the
-  // new robot configuration. Note in particular that we need to clear
-  // the collision_result before making a new collision checking
-  // request.
+  // ロボットの今の状態に変更を加えてみましょう．
+  // プランニング環境では，現在の状態を内部で維持してくれます．
+  // それらの情報の参照や変更，そして新しく構築したロボットの衝突判定もできます．
+  // 再度衝突判定をする際には，先に ``collision_result`` をクリアにしなければいけないので注意してください．
 
   robot_state::RobotState& current_state = planning_scene.getCurrentStateNonConst();
   current_state.setToRandomPositions();
@@ -120,14 +113,13 @@ int main(int argc, char** argv)
   planning_scene.checkSelfCollision(collision_request, collision_result);
   ROS_INFO_STREAM("Test 2: Current state is " << (collision_result.collision ? "in" : "not in") << " self collision");
 
-  // Checking for a group
-  // ~~~~~~~~~~~~~~~~~~~~
+  // グループでの判定
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // Now, we will do collision checking only for the hand of the
-  // Panda, i.e. we will check whether there are any collisions between
-  // the hand and other parts of the body of the robot. We can ask
-  // for this specifically by adding the group name "hand" to the
-  // collision request.
+  // ここでは，Pandaロボットの手のみに衝突判定を行います，
+  // つまり手とロボットの他の部位との衝突が発生しているのかどうかを確認します．
+  // ``colision_request`` に ``hand`` というグループ名を加えることで，
+  // 確認することが出来ます．
 
   collision_request.group_name = "hand";
   current_state.setToRandomPositions();
@@ -135,13 +127,13 @@ int main(int argc, char** argv)
   planning_scene.checkSelfCollision(collision_request, collision_result);
   ROS_INFO_STREAM("Test 3: Current state is " << (collision_result.collision ? "in" : "not in") << " self collision");
 
-  // Getting Contact Information
+  // 衝突情報の取得
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // First, manually set the Panda arm to a position where we know
-  // internal (self) collisions do happen. Note that this state is now
-  // actually outside the joint limits of the Panda, which we can also
-  // check for directly.
+  // まず，内部（自己）干渉が起こる任意の位置にPandaロボットの腕を動かします．
+  // 直接調べることは可能ですが，
+  // 任意で動かした腕の状態は限界関節角度を超えてしまっていることも
+  // あるので，注意してください．
 
   std::vector<double> joint_values = { 0.0, 0.0, 0.0, -2.9, 0.0, 1.4, 0.0 };
   const robot_model::JointModelGroup* joint_model_group = current_state.getJointModelGroup("panda_arm");
@@ -149,11 +141,9 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("Test 4: Current state is "
                   << (current_state.satisfiesBounds(joint_model_group) ? "valid" : "not valid"));
 
-  // Now, we can get contact information for any collisions that might
-  // have happened at a given configuration of the Panda arm. We can ask
-  // for contact information by filling in the appropriate field in the
-  // collision request and specifying the maximum number of contacts to
-  // be returned as a large number.
+  // ようやくコンフィグレーションされたPandaロボットの腕に関するどんな些細な衝突情報でも得られるようになりました．
+  // ``colision_request`` の適切な場所を埋め，
+  // 衝突を判定する最大数を指定することで，衝突情報を得ることが出来ます．
 
   collision_request.contacts = true;
   collision_request.max_contacts = 1000;
@@ -169,21 +159,18 @@ int main(int argc, char** argv)
     ROS_INFO("Contact between: %s and %s", it->first.first.c_str(), it->first.second.c_str());
   }
 
-  // Modifying the Allowed Collision Matrix
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // 衝突判定除外マトリクスの変更
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // The :collision_detection_class:`AllowedCollisionMatrix` (ACM)
-  // provides a mechanism to tell the collision world to ignore
-  // collisions between certain object: both parts of the robot and
-  // objects in the world. We can tell the collision checker to ignore
-  // all collisions between the links reported above, i.e. even though
-  // the links are actually in collision, the collision checker will
-  // ignore those collisions and return not in collision for this
-  // particular state of the robot.
+  // :collision_detection_class:`AllowedCollisionMatrix` (ACM)
+  // は環境内のロボット自身や物体同士の衝突を無視するように指示するための
+  // メカニズムを提供してくれます．
+  // 衝突判定システムに上記のリンク同士の全ての衝突を無視するように，
+  // つまり実際はリンクが衝突していたとしても，システム上では
+  // これらのリンクの衝突を無視し，そのロボットの状態は衝突していないと返すように命令します．
   //
-  // Note also in this example how we are making copies of both the
-  // allowed collision matrix and the current state and passing them in
-  // to the collision checking function.
+  // 今回の例では，衝突判定除外マトリクスや現在の状態のコピーの仕方や
+  // 衝突判定関数にそれらを渡す方法を記してあります．
 
   collision_detection::AllowedCollisionMatrix acm = planning_scene.getAllowedCollisionMatrix();
   robot_state::RobotState copied_state = planning_scene.getCurrentState();
@@ -197,43 +184,38 @@ int main(int argc, char** argv)
   planning_scene.checkSelfCollision(collision_request, collision_result, copied_state, acm);
   ROS_INFO_STREAM("Test 6: Current state is " << (collision_result.collision ? "in" : "not in") << " self collision");
 
-  // Full Collision Checking
+  // 全衝突判定
   // ~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // While we have been checking for self-collisions, we can use the
-  // checkCollision functions instead which will check for both
-  // self-collisions and for collisions with the environment (which is
-  // currently empty).  This is the set of collision checking
-  // functions that you will use most often in a planner. Note that
-  // collision checks with the environment will use the padded version
-  // of the robot. Padding helps in keeping the robot further away
-  // from obstacles in the environment.
+  // 先程まで自己衝突判定のみ行ってきましたが，
+  // 自己衝突判定と（現在はなにもありませんが）環境内衝突判定の２つを行ってくれる ``checkCollision`` 関数を代わりに使っていきます．
+  // この関数は全ての衝突判定をしてくれるので，プランナ内でよく用いられます．
+  // 環境内の衝突判定ではパディングされたロボットが用いられます．
+  // パディングとは，環境内でロボットを障害物と一定の距離を保ってくれることを指します．
   collision_result.clear();
   planning_scene.checkCollision(collision_request, collision_result, copied_state, acm);
   ROS_INFO_STREAM("Test 7: Current state is " << (collision_result.collision ? "in" : "not in") << " self collision");
 
-  // Constraint Checking
-  // ^^^^^^^^^^^^^^^^^^^
+  // 拘束条件の確認
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   //
-  // The PlanningScene class also includes easy to use function calls
-  // for checking constraints. The constraints can be of two types:
-  // (a) constraints chosen from the
-  // :kinematic_constraints:`KinematicConstraint` set:
-  // i.e. :kinematic_constraints:`JointConstraint`,
-  // :kinematic_constraints:`PositionConstraint`,
-  // :kinematic_constraints:`OrientationConstraint` and
-  // :kinematic_constraints:`VisibilityConstraint` and (b) user
-  // defined constraints specified through a callback. We will first
-  // look at an example with a simple KinematicConstraint.
+  // :planning_scene:`PlanningScene` クラスは，拘束条件を確認するための便利な関数を有しています．
+  // 拘束条件には２つのタイプがあります:
+  // (a) 
+  // :kinematic_constraints:`KinematicConstraint` から選ばれた拘束条件:
+  // 例えば :kinematic_constraints:`JointConstraint` や，
+  // :kinematic_constraints:`PositionConstraint` ，
+  // :kinematic_constraints:`OrientationConstraint` ，
+  // :kinematic_constraints:`VisibilityConstraint` もしくは (b) ユーザが
+  // コールバックをもとに決定した拘束条件です．
+  // まずは単純な :kinematic_constraints:`KinematicConstraint` 条件下の例から見ていきましょう．
   //
-  // Checking Kinematic Constraints
+  // 運動拘束の確認
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //
-  // We will first define a simple position and orientation constraint
-  // on the end-effector of the panda_arm group of the Panda robot. Note the
-  // use of convenience functions for filling up the constraints
-  // (these functions are found in the :moveit_core_files:`utils.h<utils_8h>` file from the
-  // kinematic_constraints directory in moveit_core).
+  // まず，Pandaロボットのグループである ``panda_arm`` のエンドエフェクタの単純な位置や方向の拘束を定義します．
+  // 拘束条件を満たす便利な関数の使用を記しておきます．
+  // （これらの関数は， *moveit_core* にある *kinematic_constraints* ディレクトリの :moveit_core_files:`utils.h<utils_8h>` で見つけられます．）
 
   std::string end_effector_name = joint_model_group->getLinkModelNames().back();
 
@@ -246,55 +228,51 @@ int main(int argc, char** argv)
   moveit_msgs::Constraints goal_constraint =
       kinematic_constraints::constructGoalConstraints(end_effector_name, desired_pose);
 
-  // Now, we can check a state against this constraint using the
-  // isStateConstrained functions in the PlanningScene class.
+  // ``isStateConstrained`` 関数を ``PlanningScene`` クラスで用いると，
+  // 拘束条件下での状態を確認できます．
 
   copied_state.setToRandomPositions();
   copied_state.update();
   bool constrained = planning_scene.isStateConstrained(copied_state, goal_constraint);
   ROS_INFO_STREAM("Test 8: Random state is " << (constrained ? "constrained" : "not constrained"));
 
-  // There's a more efficient way of checking constraints (when you want
-  // to check the same constraint over and over again, e.g. inside a
-  // planner). We first construct a KinematicConstraintSet which
-  // pre-processes the ROS Constraints messages and sets it up for quick
-  // processing.
+  // 拘束条件を確認するのにもっと効率的な方法があります．例えば，
+  // プランナの中で，何度も何度も同じ拘束条件を確認したいときなどに効率的です．
+  // まず，ROS Constraintsメッセージを前処理したり，
+  // 拘束に処理するための準備をする ``KinematicConstraintSet`` を構築します．
 
   kinematic_constraints::KinematicConstraintSet kinematic_constraint_set(kinematic_model);
   kinematic_constraint_set.add(goal_constraint, planning_scene.getTransforms());
   bool constrained_2 = planning_scene.isStateConstrained(copied_state, kinematic_constraint_set);
   ROS_INFO_STREAM("Test 9: Random state is " << (constrained_2 ? "constrained" : "not constrained"));
 
-  // There's a direct way to do this using the KinematicConstraintSet
-  // class.
+  // ``KinematicConstraintSet`` クラスを用いれば直接先程の作業を行えます．
 
   kinematic_constraints::ConstraintEvaluationResult constraint_eval_result =
       kinematic_constraint_set.decide(copied_state);
   ROS_INFO_STREAM("Test 10: Random state is "
                   << (constraint_eval_result.satisfied ? "constrained" : "not constrained"));
 
-  // User-defined constraints
+  // 拘束条件の設定
   // ~~~~~~~~~~~~~~~~~~~~~~~~
   //
   // CALL_SUB_TUTORIAL stateFeasibilityTestExample
 
-  // Now, whenever isStateFeasible is called, this user-defined callback
-  // will be called.
+  // ``isStateFeasible`` が呼ばれると，ユーザの設定したコールバックが
+  // 呼ばれます．
 
   planning_scene.setStateFeasibilityPredicate(stateFeasibilityTestExample);
   bool state_feasible = planning_scene.isStateFeasible(copied_state);
   ROS_INFO_STREAM("Test 11: Random state is " << (state_feasible ? "feasible" : "not feasible"));
 
-  // Whenever isStateValid is called, three checks are conducted: (a)
-  // collision checking (b) constraint checking and (c) feasibility
-  // checking using the user-defined callback.
+  // ``isStateValid`` が呼ばれると，次の３つのチェックが行われます: (a)
+  // 衝突判定 (b) 拘束条件の確認 そして (c) ユーザの設定したコールバックでの実現可能性
 
   bool state_valid = planning_scene.isStateValid(copied_state, kinematic_constraint_set, "panda_arm");
   ROS_INFO_STREAM("Test 12: Random state is " << (state_valid ? "valid" : "not valid"));
 
-  // Note that all the planners available through MoveIt and OMPL will
-  // currently perform collision checking, constraint checking and
-  // feasibility checking using user-defined callbacks.
+  // 現在MoveItとOMPLで利用できる全てのプランナで，衝突判定と拘束条件，
+  // ユーザの設定したコールバックでの実現可能性が行えます．
   // END_TUTORIAL
 
   ros::shutdown();
