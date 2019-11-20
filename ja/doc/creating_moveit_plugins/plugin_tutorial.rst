@@ -9,7 +9,7 @@ Motion Planner Plugin
 
 .. image:: lerp_motion_planner/lerp_planner.png
 
-まず、``moveit_tutorials`` packageの中にプラグインを作成します。プラグインクラス ``lerp``を作成するためには、フォルダ ``src`` の中に、 ``lerp_planner_manager.cpp` `という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager`` は ``planning_interface`` から ``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、 ``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは ``class_loader`` から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます。: ::
+まず、``moveit_tutorials`` packageの中にプラグインを作成します。プラグインクラス ``lerp`` を作成するためには、フォルダ ``src`` の中に、 ``lerp_planner_manager.cpp` `という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager`` は ``planning_interface`` から ``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、 ``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは ``class_loader`` から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます。: ::
 
   CLASS_LOADER_REGISTER_CLASS(emptyplan_interface::EmptyPlanPlannerManager, planning_interface::PlannerManager);
 
