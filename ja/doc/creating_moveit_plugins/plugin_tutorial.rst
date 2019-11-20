@@ -1,6 +1,6 @@
 Creating Moveit Plugins
 ========================
-`このページ<http://wiki.ros.org/pluginlib>`_ではROS general にPluginを追加する方法を説明します。Pluginを作成する上で必要な要素は、BaseとPlugin classです。Plugin Classは base classを継承し、仮想関数をオーバーライドします。このチュートリアルは異なる３種類のプラグイン（motion planner, controller manager, constraint sampler plugin)が含まれます。
+`このページ <http://wiki.ros.org/pluginlib>`_ではROS general にPluginを追加する方法を説明します。Pluginを作成する上で必要な要素は、BaseとPlugin classです。Plugin Classは base classを継承し、仮想関数をオーバーライドします。このチュートリアルは異なる３種類のプラグイン（motion planner, controller manager, constraint sampler plugin)が含まれます。
 
 
 Motion Planner Plugin
