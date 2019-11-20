@@ -5,11 +5,11 @@ Creating Moveit Plugins
 
 Motion Planner Plugin
 ----------------------
-この章では、motion plannerをMoveitのプラグインとして追加する方法を説明します。Moveitのこのbase classは全ての新しいプラグインが継承する ``planning_interface`` です。ここでは例として、2状態のモーションプランを生成するlinear interpolation planner (lerp)を作成します。このプランナーは新しいプランナーを追加する上で必要な基本要素を全て含んでいるため、スタートポイントとして使うことができます。下記の図は新しいプランナーをMoveitに追加することに関連する、各class間の関係の概要を示しています。
+この章では、motion plannerをMoveitのプラグインとして追加する方法を説明します。Moveitのこのbase classは全ての新しいプラグインが継承する ``planning_interface`` です。ここでは例として、joint spaceの2つの状態のモーションプランを生成するlinear interpolation planner (lerp)を作成します。このプランナーは新しいプランナーを追加する上で必要な基本要素を全て含んでいるため、スタートポイントとして使うことができます。下記の図は新しいプランナーをMoveitに追加することに関連する、各class間の関係の概要を示しています。
 
 .. image:: lerp_motion_planner/lerp_planner.png
 
-まず、``moveit_tutorials`` packageの中にプラグインを作成します。プラグインクラス ``lerp``を作成するためには、フォルダ``src``の中に、``lerp_planner_manager.cpp``という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager``は``planning_interface``から``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは``class_loader``から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます。: ::
+まず、``moveit_tutorials`` packageの中にプラグインを作成します。プラグインクラス ``lerp``を作成するためには、フォルダ ``src`` の中に、 ``lerp_planner_manager.cpp` `という名前のファイルを作成します。このファイルの中で、``LERPPlanPlannerManager`` は ``planning_interface`` から ``PlannerManager`` クラスの関数をオーバーライドします。このファイルの最後で、 ``LERPPlanPlannerManager`` クラスをプラグインとして登録する必要があります。これは ``class_loader`` から、``CLASS_LOADER_REGISTER_CLASS`` macroによって実行されます。: ::
 
   CLASS_LOADER_REGISTER_CLASS(emptyplan_interface::EmptyPlanPlannerManager, planning_interface::PlannerManager);
 
